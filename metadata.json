@@ -1,0 +1,6 @@
+{
+  "name": "Cyber Mahjong",
+  "description": "Juego de Mahjong cibernético con auténticos diseños tradicionales, gráficos modernos, efectos especiales de partículas y música relajante.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
