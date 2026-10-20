@@ -73,9 +73,9 @@ object AdMobManager {
     }
 
     /**
-     * Cycles through the 7 Interstitial ad units in sequence.
+     * Cycles through the 7 Interstitial ad units in sequence with automatic fallback on no-fill.
      */
-    fun preloadNextInterstitial(context: Context) {
+    fun preloadNextInterstitial(context: Context, retryCount: Int = 0) {
         if (isLoadingInterstitial || currentInterstitial != null) return
         isLoadingInterstitial = true
 
@@ -97,7 +97,11 @@ object AdMobManager {
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     currentInterstitial = null
                     isLoadingInterstitial = false
-                    Log.w(TAG, "Interstitial Ad Failed to load: ${loadAdError.message}")
+                    Log.w(TAG, "Interstitial Ad Unit $adUnitId failed to load: ${loadAdError.message}")
+                    // Automatically try next real interstitial unit in rotation if under retry limit
+                    if (retryCount < AdMobConfig.INTERSTITIAL_AD_UNIT_IDS.size - 1) {
+                        preloadNextInterstitial(context, retryCount + 1)
+                    }
                 }
             }
         )

@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.SentimentDissatisfied
 import androidx.compose.material.icons.filled.Share
@@ -37,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.data.LocalizationManager
+import com.example.model.AppLanguage
 import com.example.model.Difficulty
 import com.example.ui.theme.CyberBorder
 import com.example.ui.theme.CyberCyan
@@ -53,8 +56,10 @@ fun GameOverDialog(
     elapsedSeconds: Int,
     difficulty: Difficulty,
     playerLevel: Int = 1,
+    language: AppLanguage = AppLanguage.ES,
     onNextLevel: () -> Unit,
     onRestart: () -> Unit,
+    onMainMenu: () -> Unit = {},
     onShare: () -> Unit
 ) {
     Dialog(onDismissRequest = {}) {
@@ -272,6 +277,32 @@ fun GameOverDialog(
                             Text(text = "Repetir", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         }
                     }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Return to Main Menu
+                OutlinedButton(
+                    onClick = onMainMenu,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp)
+                        .testTag("btn_game_over_main_menu"),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(CyberBorder))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Home,
+                        contentDescription = null,
+                        tint = CyberCyan,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = LocalizationManager.string("btn_back_to_menu", language),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }

@@ -29,11 +29,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Icon
+import com.example.data.LocalizationManager
+import com.example.model.AppLanguage
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -79,6 +85,12 @@ fun CyberHud(
     difficulty: Difficulty,
     latestAchievement: Achievement?,
     isDarkMode: Boolean = true,
+    isMusicEnabled: Boolean = true,
+    isSfxEnabled: Boolean = true,
+    language: AppLanguage = AppLanguage.ES,
+    onBackToMenu: () -> Unit = {},
+    onOpenLanguage: () -> Unit = {},
+    onToggleSoundMute: () -> Unit = {},
     onToggleTheme: () -> Unit,
     onDismissAchievement: () -> Unit,
     onOpenCosmetics: () -> Unit,
@@ -191,11 +203,25 @@ fun CyberHud(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Player Level & XP
+            // Left: Back to Home + Player Level & XP
             Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
+                    onClick = onBackToMenu,
+                    modifier = Modifier.size(34.dp).testTag("btn_hud_back_to_menu")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Home,
+                        contentDescription = LocalizationManager.string("btn_back_to_menu", language),
+                        tint = primaryAccent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(2.dp))
+
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(34.dp)
                         .clip(CircleShape)
                         .background(primaryAccent.copy(alpha = 0.16f))
                         .border(1.5.dp, primaryAccent, CircleShape),
@@ -204,26 +230,26 @@ fun CyberHud(
                     Text(
                         text = "L$playerLevel",
                         color = primaryAccent,
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.dp))
 
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = if (isDarkMode) "HACKER" else "MAESTRO",
                             color = hudTextPrimary,
-                            fontSize = 11.sp,
+                            fontSize = 10.sp,
                             fontWeight = FontWeight.Bold
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "⚡ $nanocores NC",
+                            text = "⚡ $nanocores",
                             color = goldAccent,
-                            fontSize = 11.sp,
+                            fontSize = 10.sp,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
@@ -231,7 +257,7 @@ fun CyberHud(
                     LinearProgressIndicator(
                         progress = { currentLevelXp / 500f },
                         modifier = Modifier
-                            .width(76.dp)
+                            .width(68.dp)
                             .height(4.dp)
                             .clip(RoundedCornerShape(2.dp)),
                         color = primaryAccent,
@@ -240,11 +266,28 @@ fun CyberHud(
                 }
             }
 
-            // Quick Menu Actions + THEME TOGGLE SWITCH
+            // Quick Menu Actions: Language, Theme, Sound, Dialogs
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
+                // Language Selector Button
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(if (isDarkMode) CyberSurfaceVariant else Color(0xFFF1F5F9))
+                        .border(
+                            1.dp,
+                            if (isDarkMode) primaryAccent.copy(alpha = 0.5f) else Color(0xFFD97706).copy(alpha = 0.5f),
+                            RoundedCornerShape(16.dp)
+                        )
+                        .clickable { onOpenLanguage() }
+                        .padding(horizontal = 6.dp, vertical = 4.dp)
+                        .testTag("btn_hud_language"),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = language.flag, fontSize = 12.sp)
+                }
                 // Interactive Light/Dark Theme Switch
                 Box(
                     modifier = Modifier
@@ -277,6 +320,20 @@ fun CyberHud(
                             fontWeight = FontWeight.Bold
                         )
                     }
+                }
+
+                // Quick Sound Mute / Unmute Toggle Button
+                val isAudioActive = isMusicEnabled || isSfxEnabled
+                IconButton(
+                    onClick = onToggleSoundMute,
+                    modifier = Modifier.size(34.dp).testTag("btn_sound_toggle")
+                ) {
+                    Icon(
+                        imageVector = if (isAudioActive) Icons.Default.VolumeUp else Icons.Default.VolumeOff,
+                        contentDescription = if (isAudioActive) "Silenciar Sonido" else "Activar Sonido",
+                        tint = if (isAudioActive) primaryAccent else Color(0xFFEF4444),
+                        modifier = Modifier.size(19.dp)
+                    )
                 }
 
                 IconButton(
@@ -347,7 +404,7 @@ fun CyberHud(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "$score PTS",
+                    text = "$score ${LocalizationManager.string("score", language)}",
                     color = hudTextPrimary,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.ExtraBold
@@ -380,14 +437,14 @@ fun CyberHud(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Fichas: $remainingTiles",
+                    text = "${LocalizationManager.string("tiles_remaining", language)}: $remainingTiles",
                     color = primaryAccent,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Parejas: $availablePairs",
+                    text = "${LocalizationManager.string("pairs_available", language)}: $availablePairs",
                     color = if (availablePairs > 0) amberAccent else Color(0xFFDC2626),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold

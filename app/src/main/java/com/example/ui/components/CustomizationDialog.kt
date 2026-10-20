@@ -1,5 +1,6 @@
 package com.example.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -56,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.audio.AmbientSoundMode
+import com.example.model.AppLanguage
 import com.example.model.GraphicsQuality
 import com.example.model.ScenarioTheme
 import com.example.model.TileSkin
@@ -81,9 +83,11 @@ fun CustomizationDialog(
     musicVolume: Float,
     sfxVolume: Float,
     ambientSoundMode: AmbientSoundMode,
+    language: AppLanguage = AppLanguage.ES,
     onSelectSkin: (TileSkin) -> Unit,
     onSelectScenario: (ScenarioTheme) -> Unit,
     onSelectQuality: (GraphicsQuality) -> Unit,
+    onToggleMasterAudio: () -> Unit = {},
     onToggleMusic: () -> Unit,
     onToggleSfx: () -> Unit,
     onToggleHaptics: () -> Unit,
@@ -91,6 +95,7 @@ fun CustomizationDialog(
     onMusicVolumeChange: (Float) -> Unit,
     onSfxVolumeChange: (Float) -> Unit,
     onSelectAmbientMode: (AmbientSoundMode) -> Unit,
+    onOpenLanguage: () -> Unit = {},
     onDismiss: () -> Unit
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -109,7 +114,7 @@ fun CustomizationDialog(
                     .fillMaxWidth()
                     .padding(18.dp)
             ) {
-                // Header with Nanocores balance
+                // Header with Nanocores balance and Language chip
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -130,12 +135,38 @@ fun CustomizationDialog(
                         )
                     }
 
-                    IconButton(onClick = onDismiss) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Cerrar",
-                            tint = Color.White.copy(alpha = 0.7f)
-                        )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color.Black.copy(alpha = 0.45f),
+                            border = BorderStroke(1.dp, CyberCyan.copy(alpha = 0.6f)),
+                            modifier = Modifier
+                                .clickable { onOpenLanguage() }
+                                .padding(end = 4.dp)
+                                .testTag("btn_cosmetics_language")
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(text = language.flag, fontSize = 12.sp)
+                                Text(
+                                    text = language.code.uppercase(),
+                                    color = CyberCyan,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        IconButton(onClick = onDismiss) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Cerrar",
+                                tint = Color.White.copy(alpha = 0.7f)
+                            )
+                        }
                     }
                 }
 
@@ -196,6 +227,7 @@ fun CustomizationDialog(
                             sfxVolume = sfxVolume,
                             ambientSoundMode = ambientSoundMode,
                             onSelectQuality = onSelectQuality,
+                            onToggleMasterAudio = onToggleMasterAudio,
                             onToggleMusic = onToggleMusic,
                             onToggleSfx = onToggleSfx,
                             onToggleHaptics = onToggleHaptics,
@@ -443,6 +475,7 @@ private fun AudioAndQualitySettings(
     sfxVolume: Float,
     ambientSoundMode: AmbientSoundMode,
     onSelectQuality: (GraphicsQuality) -> Unit,
+    onToggleMasterAudio: () -> Unit,
     onToggleMusic: () -> Unit,
     onToggleSfx: () -> Unit,
     onToggleHaptics: () -> Unit,
@@ -451,11 +484,263 @@ private fun AudioAndQualitySettings(
     onSfxVolumeChange: (Float) -> Unit,
     onSelectAmbientMode: (AmbientSoundMode) -> Unit
 ) {
+    val isAnyAudioActive = isMusicEnabled || isSfxEnabled
+
     LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // Section: Spatial Stereo Audio
+        // Section: Master Audio Control
         item {
             Text(
-                text = "AUDIO ESPACIAL & MÚSICA RELAJANTE",
+                text = "CONTROL DE AUDIO PRINCIPAL",
+                color = CyberCyan,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        // Master Mute / Unmute Toggle Card
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(
+                        if (isAnyAudioActive) CyberCyan.copy(alpha = 0.12f)
+                        else Color.Red.copy(alpha = 0.12f)
+                    )
+                    .border(
+                        1.5.dp,
+                        if (isAnyAudioActive) CyberCyan else Color(0xFFEF4444),
+                        RoundedCornerShape(14.dp)
+                    )
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (isAnyAudioActive) CyberCyan.copy(alpha = 0.22f)
+                                else Color(0xFFEF4444).copy(alpha = 0.22f)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isAnyAudioActive) Icons.Default.VolumeUp else Icons.Default.VolumeOff,
+                            contentDescription = if (isAnyAudioActive) "Audio Activo" else "Audio Silenciado",
+                            tint = if (isAnyAudioActive) CyberCyan else Color(0xFFEF4444),
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = if (isAnyAudioActive) "Sonido General: ACTIVO" else "Sonido General: SILENCIADO",
+                            color = Color.White,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = if (isAnyAudioActive) "Música y efectos audibles" else "Música y efectos silenciados",
+                            color = Color.White.copy(alpha = 0.7f),
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+
+                Switch(
+                    checked = isAnyAudioActive,
+                    onCheckedChange = { onToggleMasterAudio() },
+                    modifier = Modifier.testTag("switch_master_mute"),
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = CyberCyan,
+                        checkedTrackColor = CyberCyan.copy(alpha = 0.45f),
+                        uncheckedThumbColor = Color(0xFFEF4444),
+                        uncheckedTrackColor = Color(0xFFEF4444).copy(alpha = 0.3f)
+                    )
+                )
+            }
+        }
+
+        // Section: Individual Sound Controls
+        item {
+            Text(
+                text = "AJUSTES INDIVIDUALES DE MÚSICA & EFECTOS",
+                color = CyberGold,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        // Background Music Toggle & Slider Card
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Black.copy(alpha = 0.38f))
+                    .border(
+                        1.dp,
+                        if (isMusicEnabled) CyberCyan.copy(alpha = 0.6f) else CyberBorder,
+                        RoundedCornerShape(12.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = if (isMusicEnabled) Icons.Default.MusicNote else Icons.Default.VolumeOff,
+                            contentDescription = null,
+                            tint = if (isMusicEnabled) CyberCyan else Color.Gray,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = "Música de Fondo Zen",
+                                color = Color.White,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = if (isMusicEnabled) "Banda sonora sintetizada activa" else "Silenciado",
+                                color = if (isMusicEnabled) CyberCyan else Color.Gray,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+
+                    Switch(
+                        checked = isMusicEnabled,
+                        onCheckedChange = { onToggleMusic() },
+                        modifier = Modifier.testTag("switch_music_toggle"),
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = CyberCyan,
+                            checkedTrackColor = CyberCyan.copy(alpha = 0.4f)
+                        )
+                    )
+                }
+
+                if (isMusicEnabled) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "Volumen Música", color = Color.White.copy(alpha = 0.75f), fontSize = 11.sp)
+                        Text(text = "${(musicVolume * 100).toInt()}%", color = CyberCyan, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Slider(
+                        value = musicVolume,
+                        onValueChange = onMusicVolumeChange,
+                        modifier = Modifier.testTag("slider_music_volume"),
+                        colors = SliderDefaults.colors(
+                            thumbColor = CyberCyan,
+                            activeTrackColor = CyberCyan,
+                            inactiveTrackColor = Color.DarkGray
+                        )
+                    )
+                }
+            }
+        }
+
+        // Sound Effects (SFX) Toggle & Slider Card
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Black.copy(alpha = 0.38f))
+                    .border(
+                        1.dp,
+                        if (isSfxEnabled) CyberMagenta.copy(alpha = 0.6f) else CyberBorder,
+                        RoundedCornerShape(12.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = if (isSfxEnabled) Icons.Default.VolumeDown else Icons.Default.VolumeOff,
+                            contentDescription = null,
+                            tint = if (isSfxEnabled) CyberMagenta else Color.Gray,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = "Efectos de Sonido (SFX)",
+                                color = Color.White,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = if (isSfxEnabled) "Toques, emparejamiento y combos" else "Silenciado",
+                                color = if (isSfxEnabled) CyberMagenta else Color.Gray,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+
+                    Switch(
+                        checked = isSfxEnabled,
+                        onCheckedChange = { onToggleSfx() },
+                        modifier = Modifier.testTag("switch_sfx_toggle"),
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = CyberMagenta,
+                            checkedTrackColor = CyberMagenta.copy(alpha = 0.4f)
+                        )
+                    )
+                }
+
+                if (isSfxEnabled) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "Volumen Efectos", color = Color.White.copy(alpha = 0.75f), fontSize = 11.sp)
+                        Text(text = "${(sfxVolume * 100).toInt()}%", color = CyberMagenta, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Slider(
+                        value = sfxVolume,
+                        onValueChange = onSfxVolumeChange,
+                        modifier = Modifier.testTag("slider_sfx_volume"),
+                        colors = SliderDefaults.colors(
+                            thumbColor = CyberMagenta,
+                            activeTrackColor = CyberMagenta,
+                            inactiveTrackColor = Color.DarkGray
+                        )
+                    )
+                }
+            }
+        }
+
+        // Section: Spatial Stereo Audio & Modes
+        item {
+            Text(
+                text = "AUDIO ESPACIAL & BANDA SONORA",
                 color = CyberCyan,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
@@ -546,96 +831,6 @@ private fun AudioAndQualitySettings(
                         }
                     }
                 }
-            }
-        }
-
-        // Music Volume Slider
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.Black.copy(alpha = 0.35f))
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = if (isMusicEnabled) Icons.Default.VolumeUp else Icons.Default.VolumeOff,
-                            contentDescription = null,
-                            tint = CyberCyan,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Volumen Música Zen", color = Color.White, fontSize = 12.sp)
-                    }
-                    Text(
-                        text = if (isMusicEnabled) "${(musicVolume * 100).toInt()}%" else "Silenciado",
-                        color = CyberCyan,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Slider(
-                    value = if (isMusicEnabled) musicVolume else 0f,
-                    onValueChange = onMusicVolumeChange,
-                    enabled = isMusicEnabled,
-                    colors = SliderDefaults.colors(
-                        thumbColor = CyberCyan,
-                        activeTrackColor = CyberCyan,
-                        inactiveTrackColor = Color.DarkGray
-                    )
-                )
-            }
-        }
-
-        // SFX Volume Slider
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.Black.copy(alpha = 0.35f))
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.VolumeDown,
-                            contentDescription = null,
-                            tint = CyberMagenta,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Volumen Efectos de Fichas", color = Color.White, fontSize = 12.sp)
-                    }
-                    Text(
-                        text = if (isSfxEnabled) "${(sfxVolume * 100).toInt()}%" else "Silenciado",
-                        color = CyberMagenta,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Slider(
-                    value = if (isSfxEnabled) sfxVolume else 0f,
-                    onValueChange = onSfxVolumeChange,
-                    enabled = isSfxEnabled,
-                    colors = SliderDefaults.colors(
-                        thumbColor = CyberMagenta,
-                        activeTrackColor = CyberMagenta,
-                        inactiveTrackColor = Color.DarkGray
-                    )
-                )
             }
         }
 

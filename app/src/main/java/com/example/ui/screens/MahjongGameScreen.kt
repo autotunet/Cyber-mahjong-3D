@@ -1,6 +1,7 @@
 package com.example.ui.screens
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -54,6 +55,7 @@ import com.example.ui.components.CustomizationDialog
 import com.example.ui.components.DifficultyDialog
 import com.example.ui.components.GameOverDialog
 import com.example.ui.components.HelpDialog
+import com.example.ui.components.LanguageDialog
 import com.example.ui.effects.CyberMatchEffectOverlay
 import com.example.ui.render2d.Mahjong2DRenderer
 import com.example.ui.render2d.ProjectedTile2D
@@ -70,7 +72,19 @@ fun MahjongGameScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val activity = context as? Activity
     val textMeasurer = rememberTextMeasurer()
+
+    // Handle Android system back gesture to smoothly return to Main Menu with ad transition
+    BackHandler {
+        if (activity != null) {
+            AdMobManager.showAutomaticInterstitial(activity) {
+                viewModel.navigateToMainMenu()
+            }
+        } else {
+            viewModel.navigateToMainMenu()
+        }
+    }
 
     var projectedTilesCache by remember { mutableStateOf<List<ProjectedTile2D>>(emptyList()) }
     var matchTile1Pos by remember { mutableStateOf<Offset?>(null) }
@@ -279,6 +293,20 @@ fun MahjongGameScreen(
             difficulty = uiState.difficulty,
             latestAchievement = uiState.latestUnlockedAchievement,
             isDarkMode = uiState.isDarkMode,
+            isMusicEnabled = uiState.isMusicEnabled,
+            isSfxEnabled = uiState.isSfxEnabled,
+            language = uiState.language,
+            onBackToMenu = {
+                if (activity != null) {
+                    AdMobManager.showAutomaticInterstitial(activity) {
+                        viewModel.navigateToMainMenu()
+                    }
+                } else {
+                    viewModel.navigateToMainMenu()
+                }
+            },
+            onOpenLanguage = { viewModel.setLanguageDialog(true) },
+            onToggleSoundMute = { viewModel.toggleMasterAudio() },
             onToggleTheme = { viewModel.toggleTheme() },
             onDismissAchievement = { viewModel.dismissAchievementToast() },
             onOpenCosmetics = { viewModel.setDialog(cosmetics = true) },
@@ -289,8 +317,6 @@ fun MahjongGameScreen(
                 .align(Alignment.TopCenter)
                 .statusBarsPadding()
         )
-
-        val activity = context as? Activity
 
         // ==================== BOTTOM CONTROLS & ADMOB BANNER DEBAJO ====================
         Column(
@@ -337,6 +363,7 @@ fun MahjongGameScreen(
                 onSelectSkin = { viewModel.purchaseOrSelectSkin(it) },
                 onSelectScenario = { viewModel.purchaseOrSelectScenario(it) },
                 onSelectQuality = { viewModel.setQuality(it) },
+                onToggleMasterAudio = { viewModel.toggleMasterAudio() },
                 onToggleMusic = { viewModel.toggleMusic() },
                 onToggleSfx = { viewModel.toggleSfx() },
                 onToggleHaptics = { viewModel.toggleHaptics() },
@@ -344,6 +371,8 @@ fun MahjongGameScreen(
                 onMusicVolumeChange = { viewModel.setMusicVolume(it) },
                 onSfxVolumeChange = { viewModel.setSfxVolume(it) },
                 onSelectAmbientMode = { viewModel.setAmbientSoundMode(it) },
+                language = uiState.language,
+                onOpenLanguage = { viewModel.setLanguageDialog(true) },
                 onDismiss = { viewModel.setDialog(cosmetics = false) }
             )
         }
@@ -361,6 +390,7 @@ fun MahjongGameScreen(
         if (uiState.showDifficultyDialog) {
             DifficultyDialog(
                 currentDifficulty = uiState.difficulty,
+                language = uiState.language,
                 onSelectDifficulty = { diff ->
                     if (activity != null) {
                         AdMobManager.showAutomaticInterstitial(activity) {
@@ -375,7 +405,18 @@ fun MahjongGameScreen(
         }
 
         if (uiState.showHelpDialog) {
-            HelpDialog(onDismiss = { viewModel.setDialog(help = false) })
+            HelpDialog(
+                language = uiState.language,
+                onDismiss = { viewModel.setDialog(help = false) }
+            )
+        }
+
+        if (uiState.showLanguageDialog) {
+            LanguageDialog(
+                currentLanguage = uiState.language,
+                onSelectLanguage = { viewModel.setLanguage(it) },
+                onDismiss = { viewModel.setLanguageDialog(false) }
+            )
         }
 
         if (uiState.isGameOver || uiState.isVictory) {
@@ -386,6 +427,7 @@ fun MahjongGameScreen(
                 elapsedSeconds = uiState.elapsedSeconds,
                 difficulty = uiState.difficulty,
                 playerLevel = uiState.playerLevel,
+                language = uiState.language,
                 onNextLevel = {
                     if (activity != null) {
                         AdMobManager.showAutomaticInterstitial(activity) {
@@ -402,6 +444,15 @@ fun MahjongGameScreen(
                         }
                     } else {
                         viewModel.startNewGame(uiState.difficulty)
+                    }
+                },
+                onMainMenu = {
+                    if (activity != null) {
+                        AdMobManager.showAutomaticInterstitial(activity) {
+                            viewModel.navigateToMainMenu()
+                        }
+                    } else {
+                        viewModel.navigateToMainMenu()
                     }
                 },
                 onShare = { viewModel.shareVictory(context) }

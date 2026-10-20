@@ -13,8 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.audio.CyberAudioEngine
 import com.example.data.GamePreferencesRepository
+import com.example.model.AppScreen
 import com.example.sensor.OrientationSensorManager
 import com.example.ui.screens.MahjongGameScreen
+import com.example.ui.screens.MainMenuScreen
 import com.example.ui.theme.CyberBackground
 import com.example.ui.theme.MyApplicationTheme
 import com.example.viewmodel.MahjongViewModel
@@ -46,7 +48,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MahjongGameScreen(viewModel = viewModel)
+                    when (uiState.currentScreen) {
+                        AppScreen.MAIN_MENU -> MainMenuScreen(viewModel = viewModel)
+                        AppScreen.GAME -> MahjongGameScreen(viewModel = viewModel)
+                    }
                 }
             }
         }

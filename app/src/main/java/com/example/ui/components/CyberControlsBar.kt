@@ -33,6 +33,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.LocalizationManager
+import com.example.model.AppLanguage
 import com.example.ui.theme.CyberBorder
 import com.example.ui.theme.CyberCyan
 import com.example.ui.theme.CyberGold
@@ -47,6 +49,7 @@ import com.example.ui.theme.LightTextPrimary
 fun CyberControlsBar(
     availablePairs: Int,
     isDarkMode: Boolean = true,
+    language: AppLanguage = AppLanguage.ES,
     onHint: () -> Unit,
     onShuffle: () -> Unit,
     onUndo: () -> Unit,

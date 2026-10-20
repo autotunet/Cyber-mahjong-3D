@@ -32,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.data.LocalizationManager
+import com.example.model.AppLanguage
 import com.example.model.Difficulty
 import com.example.ui.theme.CyberBorder
 import com.example.ui.theme.CyberCyan
@@ -42,6 +44,7 @@ import com.example.ui.theme.CyberSurface
 @Composable
 fun DifficultyDialog(
     currentDifficulty: Difficulty,
+    language: AppLanguage = AppLanguage.ES,
     onSelectDifficulty: (Difficulty) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -64,7 +67,7 @@ fun DifficultyDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "SELECCIONA DIFICULTAD",
+                        text = LocalizationManager.string("btn_difficulty", language),
                         color = Color.White,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Black

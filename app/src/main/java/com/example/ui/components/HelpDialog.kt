@@ -37,13 +37,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.data.LocalizationManager
+import com.example.model.AppLanguage
 import com.example.ui.theme.CyberCyan
 import com.example.ui.theme.CyberGold
 import com.example.ui.theme.CyberMagenta
 import com.example.ui.theme.CyberSurface
 
 @Composable
-fun HelpDialog(onDismiss: () -> Unit) {
+fun HelpDialog(
+    language: AppLanguage = AppLanguage.ES,
+    onDismiss: () -> Unit
+) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             modifier = Modifier
@@ -219,7 +224,7 @@ fun HelpDialog(onDismiss: () -> Unit) {
                     colors = ButtonDefaults.buttonColors(containerColor = CyberCyan)
                 ) {
                     Text(
-                        text = "ENTENDIDO",
+                        text = LocalizationManager.string("btn_close", language),
                         color = Color.Black,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp

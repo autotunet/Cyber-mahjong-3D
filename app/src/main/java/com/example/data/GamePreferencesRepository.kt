@@ -32,7 +32,12 @@ class GamePreferencesRepository(context: Context) {
         private const val KEY_UNLOCKED_SCENARIOS = "unlocked_scenarios"
         private const val KEY_UNLOCKED_ACHIEVEMENTS = "unlocked_achievements"
         private const val KEY_IS_DARK_MODE = "is_dark_mode"
+        private const val KEY_LANGUAGE = "app_language"
     }
+
+    var language: String
+        get() = prefs.getString(KEY_LANGUAGE, "es") ?: "es"
+        set(value) = prefs.edit().putString(KEY_LANGUAGE, value).apply()
 
     var isDarkMode: Boolean
         get() = prefs.getBoolean(KEY_IS_DARK_MODE, true)

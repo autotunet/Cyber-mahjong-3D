@@ -34,7 +34,9 @@ enum class Difficulty(
         initialTileCount = 144,
         timeLimitSeconds = 240,
         scoreMultiplier = 3.0f
-    )
+    );
+
+    val label: String get() = title
 }
 
 enum class TileSkin(

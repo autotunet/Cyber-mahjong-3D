@@ -15,10 +15,12 @@ import com.example.model.MahjongLayout
 import com.example.model.MahjongTile
 import com.example.model.ScenarioTheme
 import com.example.model.TileSkin
+import com.example.model.AppLanguage
+import com.example.model.AppScreen
+import com.example.model.MatchEffectEvent
 import com.example.sensor.OrientationSensorManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import com.example.model.MatchEffectEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +29,10 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 data class GameUiState(
+    val currentScreen: AppScreen = AppScreen.MAIN_MENU,
+    val language: AppLanguage = AppLanguage.ES,
+    val showLanguageDialog: Boolean = false,
+    val showSettingsDialog: Boolean = false,
     val tiles: List<MahjongTile> = emptyList(),
     val selectedTile: MahjongTile? = null,
     val score: Int = 0,
@@ -130,8 +136,11 @@ class MahjongViewModel(
 
         val ambientMode = AmbientSoundMode.values().firstOrNull { it.name == repo.ambientTrackMode } ?: AmbientSoundMode.ZEN_DRONE
 
+        val savedLang = AppLanguage.fromCode(repo.language)
+
         _uiState.update {
             it.copy(
+                language = savedLang,
                 playerLevel = repo.level,
                 playerXp = repo.xp,
                 nanocores = repo.nanocores,
@@ -604,6 +613,16 @@ class MahjongViewModel(
         _uiState.update { it.copy(graphicsQuality = quality) }
     }
 
+    fun toggleMasterAudio() {
+        val isAnySoundActive = _uiState.value.isMusicEnabled || _uiState.value.isSfxEnabled
+        val next = !isAnySoundActive
+        repo.isMusicEnabled = next
+        audioEngine.setMusicEnabled(next, _uiState.value.selectedScenario.ambientDroneBaseFreq)
+        repo.isSfxEnabled = next
+        audioEngine.setSfxEnabled(next)
+        _uiState.update { it.copy(isMusicEnabled = next, isSfxEnabled = next) }
+    }
+
     fun toggleMusic() {
         val next = !_uiState.value.isMusicEnabled
         repo.isMusicEnabled = next
@@ -682,16 +701,46 @@ class MahjongViewModel(
         achievements: Boolean = false,
         cosmetics: Boolean = false,
         difficulty: Boolean = false,
-        help: Boolean = false
+        help: Boolean = false,
+        language: Boolean = false
     ) {
         _uiState.update {
             it.copy(
                 showAchievementsDialog = achievements,
                 showCosmeticsDialog = cosmetics,
                 showDifficultyDialog = difficulty,
-                showHelpDialog = help
+                showHelpDialog = help,
+                showLanguageDialog = language
             )
         }
+    }
+
+    fun setLanguageDialog(show: Boolean) {
+        _uiState.update { it.copy(showLanguageDialog = show) }
+    }
+
+    fun setSettingsDialog(show: Boolean) {
+        _uiState.update { it.copy(showSettingsDialog = show) }
+    }
+
+    fun playTestSound() {
+        audioEngine.playPairMatched()
+    }
+
+    fun setLanguage(lang: AppLanguage) {
+        repo.language = lang.code
+        _uiState.update { it.copy(language = lang, showLanguageDialog = false) }
+        audioEngine.playTileClick()
+    }
+
+    fun navigateToGame() {
+        _uiState.update { it.copy(currentScreen = AppScreen.GAME) }
+        audioEngine.playTileClick()
+    }
+
+    fun navigateToMainMenu() {
+        _uiState.update { it.copy(currentScreen = AppScreen.MAIN_MENU) }
+        audioEngine.playTileClick()
     }
 
     fun shareAchievement(achievement: Achievement, context: Context) {
