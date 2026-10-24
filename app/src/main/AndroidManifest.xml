@@ -6,6 +6,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- Remove Privacy Sandbox Attribution and Topics permissions that trigger onNullBinding MEASUREMENT_SERVICE on emulators -->
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_TOPICS" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -20,6 +25,23 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
+
+        <!-- Configure AdServices Privacy Sandbox to disable attribution/topics binding on emulators -->
+        <property
+            android:name="android.adservices.AD_SERVICES_CONFIG"
+            android:resource="@xml/ad_services_config"
+            tools:replace="android:resource" />
+
+        <!-- Disable Analytics/App measurement in environments without google-services.json -->
+        <meta-data
+            android:name="firebase_analytics_collection_deactivated"
+            android:value="true" />
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="google_analytics_default_allow_ad_personalization_signals"
+            android:value="false" />
 
         <activity
             android:name=".MainActivity"

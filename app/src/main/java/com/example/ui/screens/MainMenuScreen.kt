@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
@@ -74,6 +75,7 @@ import com.example.ui.components.CustomizationDialog
 import com.example.ui.components.DifficultyDialog
 import com.example.ui.components.HelpDialog
 import com.example.ui.components.LanguageDialog
+import com.example.ui.components.SettingsDialog
 import com.example.ui.theme.CyberAmber
 import com.example.ui.theme.CyberBackground
 import com.example.ui.theme.CyberBorder
@@ -259,6 +261,24 @@ fun MainMenuScreen(
                             imageVector = if (isSoundActive) Icons.Default.VolumeUp else Icons.Default.VolumeOff,
                             contentDescription = if (isSoundActive) "Silenciar" else "Activar Sonido",
                             tint = if (isSoundActive) primaryAccent else Color(0xFFEF4444),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    // Persistent Settings Menu Button
+                    IconButton(
+                        onClick = { viewModel.setSettingsDialog(true) },
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(cardBackground)
+                            .border(1.dp, cardBorder, CircleShape)
+                            .testTag("btn_menu_settings")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Configuración",
+                            tint = primaryAccent,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -505,6 +525,41 @@ fun MainMenuScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // Settings & Audio Menu Button
+                OutlinedButton(
+                    onClick = { viewModel.setSettingsDialog(true) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .testTag("btn_menu_settings_main"),
+                    shape = RoundedCornerShape(14.dp),
+                    border = BorderStroke(1.2.dp, primaryAccent.copy(alpha = 0.8f)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = primaryAccent.copy(alpha = 0.08f)
+                    )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = null,
+                            tint = primaryAccent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = LocalizationManager.string("btn_settings", lang),
+                            color = primaryAccent,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
                 // Achievements & Rules Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -679,6 +734,34 @@ fun MainMenuScreen(
             HelpDialog(
                 language = uiState.language,
                 onDismiss = { viewModel.setDialog(help = false) }
+            )
+        }
+
+        if (uiState.showSettingsDialog) {
+            SettingsDialog(
+                isMusicEnabled = uiState.isMusicEnabled,
+                isSfxEnabled = uiState.isSfxEnabled,
+                isHapticsEnabled = uiState.isHapticsEnabled,
+                isSpatialAudioEnabled = uiState.isSpatialAudioEnabled,
+                musicVolume = uiState.musicVolume,
+                sfxVolume = uiState.sfxVolume,
+                ambientSoundMode = uiState.ambientSoundMode,
+                isDarkMode = uiState.isDarkMode,
+                selectedQuality = uiState.graphicsQuality,
+                language = uiState.language,
+                onToggleMasterAudio = { viewModel.toggleMasterAudio() },
+                onToggleMusic = { viewModel.toggleMusic() },
+                onToggleSfx = { viewModel.toggleSfx() },
+                onToggleHaptics = { viewModel.toggleHaptics() },
+                onToggleSpatialAudio = { viewModel.toggleSpatialAudio() },
+                onMusicVolumeChange = { viewModel.setMusicVolume(it) },
+                onSfxVolumeChange = { viewModel.setSfxVolume(it) },
+                onAmbientSoundModeChange = { viewModel.setAmbientSoundMode(it) },
+                onToggleTheme = { viewModel.toggleTheme() },
+                onSelectQuality = { viewModel.setQuality(it) },
+                onPlayTestSound = { viewModel.playTestSound() },
+                onOpenLanguage = { viewModel.setLanguageDialog(true) },
+                onDismiss = { viewModel.setSettingsDialog(false) }
             )
         }
     }

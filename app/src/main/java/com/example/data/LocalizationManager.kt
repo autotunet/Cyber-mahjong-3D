@@ -68,7 +68,24 @@ object LocalizationManager {
         "rule_4" to "4. Completa la matriz antes de que acabe el cronómetro para ganar XP y Nanocores.",
         "rule_5" to "5. Los emparejamientos rápidos acumulan combos multiplicadores y bonificaciones de tiempo.",
         "btn_close" to "ENTENDIDO",
-        "btn_share" to "COMPARTIR"
+        "btn_share" to "COMPARTIR",
+        "btn_settings" to "AJUSTES",
+        "settings_title" to "CONFIGURACIÓN DEL SISTEMA",
+        "settings_subtitle" to "Personaliza audio, música, efectos y gráficos",
+        "settings_master_audio" to "Audio General",
+        "settings_master_audio_sub" to "Silenciar o activar todo el audio del juego",
+        "settings_bg_music" to "Música de Fondo",
+        "settings_bg_music_sub" to "Banda sonora sintetizada Zen ambiental",
+        "settings_sfx" to "Efectos de Sonido (SFX)",
+        "settings_sfx_sub" to "Sonidos al tocar fichas, emparejar y combos",
+        "settings_ambient_track" to "Pista Ambiental Zen",
+        "settings_test_sound" to "PROBAR SONIDO",
+        "settings_spatial_audio" to "Audio Espacial 3D",
+        "settings_spatial_audio_sub" to "Sonido estéreo según la posición de la ficha",
+        "settings_haptics" to "Vibración Háptica",
+        "settings_haptics_sub" to "Respuesta al tocar fichas y realizar combos",
+        "settings_theme" to "Tema Visual",
+        "settings_graphics_quality" to "Calidad Gráfica"
     )
 
     private val enStrings = mapOf(
@@ -119,7 +136,24 @@ object LocalizationManager {
         "rule_4" to "4. Clear the board before the chronometer expires to earn XP and Nanocores.",
         "rule_5" to "5. Rapid matches generate multiplier combos and grant bonus time.",
         "btn_close" to "UNDERSTOOD",
-        "btn_share" to "SHARE"
+        "btn_share" to "SHARE",
+        "btn_settings" to "SETTINGS",
+        "settings_title" to "SYSTEM SETTINGS",
+        "settings_subtitle" to "Customize audio, music, effects, and graphics",
+        "settings_master_audio" to "Master Audio",
+        "settings_master_audio_sub" to "Mute or unmute all game audio",
+        "settings_bg_music" to "Background Music",
+        "settings_bg_music_sub" to "Ambient synthesized Zen soundtrack",
+        "settings_sfx" to "Sound Effects (SFX)",
+        "settings_sfx_sub" to "Tile clicks, match chimes, and combos",
+        "settings_ambient_track" to "Ambient Zen Track",
+        "settings_test_sound" to "TEST SOUND",
+        "settings_spatial_audio" to "3D Spatial Audio",
+        "settings_spatial_audio_sub" to "Stereo panning based on tile screen position",
+        "settings_haptics" to "Haptic Vibration",
+        "settings_haptics_sub" to "Tactile response on tile taps and combos",
+        "settings_theme" to "Visual Theme",
+        "settings_graphics_quality" to "Graphics Quality"
     )
 
     private val zhStrings = mapOf(

@@ -56,6 +56,7 @@ import com.example.ui.components.DifficultyDialog
 import com.example.ui.components.GameOverDialog
 import com.example.ui.components.HelpDialog
 import com.example.ui.components.LanguageDialog
+import com.example.ui.components.SettingsDialog
 import com.example.ui.effects.CyberMatchEffectOverlay
 import com.example.ui.render2d.Mahjong2DRenderer
 import com.example.ui.render2d.ProjectedTile2D
@@ -313,6 +314,7 @@ fun MahjongGameScreen(
             onOpenAchievements = { viewModel.setDialog(achievements = true) },
             onOpenDifficulty = { viewModel.setDialog(difficulty = true) },
             onOpenHelp = { viewModel.setDialog(help = true) },
+            onOpenSettings = { viewModel.setSettingsDialog(true) },
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .statusBarsPadding()
@@ -416,6 +418,34 @@ fun MahjongGameScreen(
                 currentLanguage = uiState.language,
                 onSelectLanguage = { viewModel.setLanguage(it) },
                 onDismiss = { viewModel.setLanguageDialog(false) }
+            )
+        }
+
+        if (uiState.showSettingsDialog) {
+            SettingsDialog(
+                isMusicEnabled = uiState.isMusicEnabled,
+                isSfxEnabled = uiState.isSfxEnabled,
+                isHapticsEnabled = uiState.isHapticsEnabled,
+                isSpatialAudioEnabled = uiState.isSpatialAudioEnabled,
+                musicVolume = uiState.musicVolume,
+                sfxVolume = uiState.sfxVolume,
+                ambientSoundMode = uiState.ambientSoundMode,
+                isDarkMode = uiState.isDarkMode,
+                selectedQuality = uiState.graphicsQuality,
+                language = uiState.language,
+                onToggleMasterAudio = { viewModel.toggleMasterAudio() },
+                onToggleMusic = { viewModel.toggleMusic() },
+                onToggleSfx = { viewModel.toggleSfx() },
+                onToggleHaptics = { viewModel.toggleHaptics() },
+                onToggleSpatialAudio = { viewModel.toggleSpatialAudio() },
+                onMusicVolumeChange = { viewModel.setMusicVolume(it) },
+                onSfxVolumeChange = { viewModel.setSfxVolume(it) },
+                onAmbientSoundModeChange = { viewModel.setAmbientSoundMode(it) },
+                onToggleTheme = { viewModel.toggleTheme() },
+                onSelectQuality = { viewModel.setQuality(it) },
+                onPlayTestSound = { viewModel.playTestSound() },
+                onOpenLanguage = { viewModel.setLanguageDialog(true) },
+                onDismiss = { viewModel.setSettingsDialog(false) }
             )
         }
 

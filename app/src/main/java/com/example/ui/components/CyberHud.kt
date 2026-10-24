@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.VolumeOff
@@ -97,6 +98,7 @@ fun CyberHud(
     onOpenAchievements: () -> Unit,
     onOpenDifficulty: () -> Unit,
     onOpenHelp: () -> Unit,
+    onOpenSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val hudSurface = if (isDarkMode) CyberSurface.copy(alpha = 0.92f) else Color.White.copy(alpha = 0.95f)
@@ -332,6 +334,19 @@ fun CyberHud(
                         imageVector = if (isAudioActive) Icons.Default.VolumeUp else Icons.Default.VolumeOff,
                         contentDescription = if (isAudioActive) "Silenciar Sonido" else "Activar Sonido",
                         tint = if (isAudioActive) primaryAccent else Color(0xFFEF4444),
+                        modifier = Modifier.size(19.dp)
+                    )
+                }
+
+                // Settings Menu Button (Audio & Customization Dialog)
+                IconButton(
+                    onClick = onOpenSettings,
+                    modifier = Modifier.size(34.dp).testTag("btn_open_settings")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Ajustes",
+                        tint = primaryAccent,
                         modifier = Modifier.size(19.dp)
                     )
                 }

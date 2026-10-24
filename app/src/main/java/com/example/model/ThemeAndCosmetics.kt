@@ -180,5 +180,7 @@ enum class GraphicsQuality(
         maxParticles = 60,
         enableBloom = true,
         enableRealtimeShadows = true
-    )
+    );
+
+    val label: String get() = title
 }

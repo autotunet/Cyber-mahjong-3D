@@ -724,7 +724,7 @@ class MahjongViewModel(
     }
 
     fun playTestSound() {
-        audioEngine.playPairMatched()
+        audioEngine.playTileMatch()
     }
 
     fun setLanguage(lang: AppLanguage) {
